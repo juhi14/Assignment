@@ -1,0 +1,120 @@
+<div class="bb m brd" >
+  <div class="h brd bBrd d-flex flex-row justify-content-start align-items-start" style="height:20%;">
+    <img src="./assets/download (3).png" alt="Image Not Found">
+    <input style="float:right;margin:25px 25px 0 0;" type="submit" value="Log Out" (click)="clearLocalStorage()">
+  </div>
+  <div class="h m d-flex flex-row justify-content-start align-items-start" style="width:98%;height:80%;">
+    <div class="h brd d-flex flex-row justify-content-start align-items-start" style="height:8%;">
+        <div class="v lp d-flex flex-column justify-content-start align-items-start" (click)="changeTab('Consulation')">
+          <input class="tabButton" [style.background-color]="(selectedTab == 'Consulation') ? 'orange' : '#EFEFEF'" type="submit" value="Consulation">
+        </div>
+        <div class="v d-flex flex-column justify-content-start align-items-start" (click)="changeTab('Physician')">
+          <input class="tabButton" [style.background-color]="(selectedTab == 'Physician') ? 'orange' : '#EFEFEF'" type="submit" value="Physician">
+        </div>
+    </div>
+    <div class="h m d-flex flex-row justify-content-start align-items-start" *ngIf="selectedTab == 'Consulation'">
+      <div class="h flex-column justify-content-start align-items-start" style="width:48%;height:97%;">
+        <div class="h p brd d-flex flex-row justify-content-start align-items-start" style="height:30%;">
+          <div class="v bm d-flex flex-row justify-content-start align-items-start" style="height: 40px;">
+            <input class="field rm" type="text" placeholder="Patient Name" [(ngModel)]="patientObj.patientName" name="patientObj.patientName" onkeypress="return ((event.charCode >= 65 && event.charCode <= 90) || (event.charCode >= 97 && event.charCode <= 122) || (event.charCode == 32))" required>
+            <input class="field" type="text" placeholder="Age" [(ngModel)]="patientObj.patientAge" name="patientObj.patientAge" required onkeypress="return (event.charCode !=8 && event.charCode ==0 || ( event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)))" maxlength="3">
+          </div>
+          <div class="h d-flex flex-row justify-content-start align-items-start" style="height:40px;">
+            <div class="h rm flex-column justify-content-start align-items-start" style="width:200px;">
+              <input class="field rm" type="text" placeholder="Physician Name" [(ngModel)]="patientObj.physicianName" name="patientObj.physicianName" onkeypress="return ((event.charCode >= 65 && event.charCode <= 90) || (event.charCode >= 97 && event.charCode <= 122) || (event.charCode == 32))" required>
+            </div>
+            <div class="h m flex-column justify-content-center align-items-center" style="width:calc(100% - 260px);">
+              <input type="radio" id="female" name="gender" [(ngModel)]="gender" value="Female" (change)="onChange($event)">
+              <label for="female">Female</label>
+              <input type="radio" id="css" name="gender" [(ngModel)]="gender" value="Male" (change)="onChange($event)">
+              <label for="css">Male</label>
+              <input type="radio" id="female" name="gender" [(ngModel)]="gender" value="Others" (change)="onChange($event)">
+              <label for="female">Others</label>
+            </div>
+          </div>
+          <div class="h btm d-flex flex-row justify-content-start align-items-start" style="height:40px;">
+            <div class="h flex-column justify-content-start align-items-start" style="width:210px;">
+              <ng-select [items]="categories" bindLabel="name" placeholder="Prescribed Test" appendTo="body" [multiple]="true" [(ngModel)]="selected"></ng-select>
+            </div>
+          </div>
+          <div class="h d-flex flex-row justify-content-end align-items-end" style="height:40px;">
+            <input class="button" type="submit" value="Reset" (click)="resetDetails()">
+            <input class="rm button bgOrange" type="submit" value="Add" (click)="addPatientDetails()">
+          </div>
+        </div>
+        <div class="h tm d-flex flex-row justify-content-start align-items-start" style="height:70%;">
+          <table class="blue">
+            <thead>
+            <tr>
+              <th class="patienttable">Patient Name</th>
+              <th class="patienttable">Physician Name</th>
+              <th class="patienttable">Prescribed Tests</th>
+            </tr>
+            </thead>
+            <tbody style="overflow-y:scroll; height:100px;">
+            <tr *ngFor="let patient of patientDetailsArr">
+              <td class="patienttable">{{patient.patientName}}</td>
+              <td class="patienttable">{{patient.physicianName}}</td>
+              <td class="patienttable">{{patient.prescribedTest}}</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="h lm p brd flex-column justify-content-start align-items-start" style="width:48%;height: 100%;">
+        <div *ngIf="ctcPercent == 0 && rtcPercent == 0 && chemistryPercent == 0"><p>No record found.</p></div>
+        <div *ngIf="ctcPercent != 0 || rtcPercent != 0 || chemistryPercent != 0" id="chartdiv"></div>
+      </div>
+    </div>
+    <div class="h m d-flex flex-row justify-content-start align-items-start" *ngIf="selectedTab == 'Physician'">
+      <div class="h flex-column justify-content-start align-items-start" style="width:48%;">
+        <div class="h p brd d-flex flex-row justify-content-start align-items-start" style="height:30%;">
+          <div class="v bm d-flex flex-row justify-content-start align-items-start" style="height: 40px;">
+            <input class="field" type="text" placeholder="Physician Name" [(ngModel)]="physicianObj.physicianName" name="physicianObj.physicianName" required [readonly]="isReadonly" onkeypress="return ((event.charCode >= 65 && event.charCode <= 90) || (event.charCode >= 97 && event.charCode <= 122) || (event.charCode == 32))">
+            <input type="text" class="field lm" placeholder="Age" [(ngModel)]="physicianObj.physicianAge" name="physicianObj.physicianAge" required onkeypress="return (event.charCode !=8 && event.charCode ==0 || ( event.charCode == 46 || (event.charCode >= 48 && event.charCode <= 57)))" maxlength="3">
+          </div>
+          <div class="h d-flex flex-row justify-content-start align-items-start" style="height:50px;">
+            <div class="h flex-column justify-content-start align-items-start" style="width:210px;">
+              <ng-select [items]="specilizationArr" bindLabel="name" placeholder="Specilization" appendTo="body" [multiple]="false" [(ngModel)]="selectedSpec"></ng-select>
+            </div>
+            <div class="h m flex-column justify-content-center align-items-center" style="width:calc(100% - 260px);">
+              <input type="radio" id="female" name="gender" [(ngModel)]="physicianObj.physicianGender" value="Female" (change)="onChange($event)">
+              <label for="female">Female</label>
+              <input type="radio" id="css" name="gender" [(ngModel)]="physicianObj.physicianGender" value="Male" (change)="onChange($event)">
+              <label for="css">Male</label>
+              <input type="radio" id="female" name="gender" [(ngModel)]="physicianObj.physicianGender" value="Others" (change)="onChange($event)">
+              <label for="female">Others</label>
+            </div>
+          </div>
+          <div class="h d-flex flex-row justify-content-start align-items-start" style="height:40px;">
+            <div class="h flex-column justify-content-start align-items-start" style="width:210px;">
+              <input class="field rm" type="text" placeholder="Qualification" [(ngModel)]="physicianObj.physicianQualification" name="physicianObj.physicianQualification" onkeypress="return ((event.charCode >= 65 && event.charCode <= 90) || (event.charCode >= 97 && event.charCode <= 122) || (event.charCode == 32))" required>
+            </div>
+          </div>
+          <div class="h d-flex flex-row justify-content-end align-items-end" style="height:40px;">
+            <input class="button" type="submit" value="Reset" (click)="resetDetails()">
+            <input class="rm button bgOrange" type="submit" value="{{buttonValue}}" (click)="buttonValue == 'Add' ? addPhysicianDetails() : updatePhysicianDetails()">
+          </div>
+        </div>
+      </div>
+      <div class="h tm d-flex flex-row justify-content-start align-items-start" style="height:70%;">
+        <table class="blue">
+          <thead>
+          <tr>
+            <th class="physiciantable">Physician Name</th>
+            <th class="physiciantable">Specilization</th>
+            <th class="physiciantable">Qualification</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let physician of physicianArr;let i = index;" (click)="selectDetails(physician,i);">
+            <td class="physiciantable">{{physician.physicianName}}</td>
+            <td class="physiciantable">{{physician.physicianSpec}}</td>
+            <td class="physiciantable">{{physician.physicianQualification}}</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
